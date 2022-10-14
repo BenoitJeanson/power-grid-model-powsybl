@@ -3,7 +3,9 @@
 
 int main()
 {
+    std::cout << "hello\n";
     PgmWrapper pgmw;
+    std::cout << "pgmw built\n";
 
     //   add_node(power_grid_model::NodeInput({{id}, u_rated}));
     pgmw.add_node(power_grid_model::NodeInput({{1}, 10.5e3}));
@@ -23,9 +25,12 @@ int main()
     pgmw.add_source(power_grid_model::SourceInput({{{10}, 1, true}, 1.0, 0, 1e10, 0.1, 1.0}));
 
     pgmw.finalize_construction();
+    std::cout << "finalized ok\n";
     auto info = power_grid_model::CalculationInfo();
 
-    pgmw.run_pf_sym(power_grid_model::CalculationMethod::newton_raphson, info);
+    pgmw.run_pf(power_grid_model::CalculationMethod::newton_raphson, info);
 
-    std::cout << "toString" << pgmw.to_String();
+    std::cout << "pf ok";
+
+    // std::cout << "toString" << pgmw.to_String();
 }

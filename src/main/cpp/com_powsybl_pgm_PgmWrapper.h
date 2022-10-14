@@ -42,10 +42,10 @@ JNIEXPORT void JNICALL Java_com_powsybl_pgm_PgmWrapper_addNode
 /*
  * Class:     com_powsybl_pgm_PgmWrapper
  * Method:    addSource
- * Signature: (JIIZD)V
+ * Signature: (JIIZDDDDD)V
  */
 JNIEXPORT void JNICALL Java_com_powsybl_pgm_PgmWrapper_addSource
-  (JNIEnv *, jobject, jlong, jint, jint, jboolean, jdouble);
+  (JNIEnv *, jobject, jlong, jint, jint, jboolean, jdouble, jdouble, jdouble, jdouble, jdouble);
 
 /*
  * Class:     com_powsybl_pgm_PgmWrapper
@@ -58,10 +58,18 @@ JNIEXPORT void JNICALL Java_com_powsybl_pgm_PgmWrapper_addSymLoaGendInput
 /*
  * Class:     com_powsybl_pgm_PgmWrapper
  * Method:    addLine
- * Signature: (JIIZIZDDDDD)V
+ * Signature: (JIIZIZDDDDDDDDD)V
  */
 JNIEXPORT void JNICALL Java_com_powsybl_pgm_PgmWrapper_addLine
-  (JNIEnv *, jobject, jlong, jint, jint, jboolean, jint, jboolean, jdouble, jdouble, jdouble, jdouble, jdouble);
+  (JNIEnv *, jobject, jlong, jint, jint, jboolean, jint, jboolean, jdouble, jdouble, jdouble, jdouble, jdouble, jdouble, jdouble, jdouble, jdouble);
+
+/*
+ * Class:     com_powsybl_pgm_PgmWrapper
+ * Method:    addTransformer
+ * Signature: (JIIZIZDDDDDDDIIBIBBBBDDDDDDDDD)V
+ */
+JNIEXPORT void JNICALL Java_com_powsybl_pgm_PgmWrapper_addTransformer
+  (JNIEnv *, jobject, jlong, jint, jint, jboolean, jint, jboolean, jdouble, jdouble, jdouble, jdouble, jdouble, jdouble, jdouble, jint, jint, jbyte, jint, jbyte, jbyte, jbyte, jbyte, jdouble, jdouble, jdouble, jdouble, jdouble, jdouble, jdouble, jdouble, jdouble);
 
 /*
  * Class:     com_powsybl_pgm_PgmWrapper

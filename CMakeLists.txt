@@ -14,6 +14,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(EIGEN_INCLUDE_DIRS "/home/linuxbrew/.linuxbrew/Cellar/eigen/3.4.0_1/include/eigen3")
+set(CMAKE_BUILD_TYPE "Debug")
 
 find_package(Eigen3 CONFIG REQUIRED)
 include_directories(${EIGEN_INCLUDE_DIRS})
