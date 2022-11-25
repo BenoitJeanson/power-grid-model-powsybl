@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.powsybl</groupId>
+    <artifactId>powsybl-parent</artifactId>
+    <version>9</version>
+    <relativePath />
+  </parent>
+
+  <groupId>com.powsybl</groupId>
+  <artifactId>powsybl-power-grid-model</artifactId>
+  <version>1.0-SNAPSHOT</version>
+
+  <name>powsybl-power-grid-model</name>
+  <!-- FIXME change it to the project's website -->
+  <url>http://www.example.com</url>
+
+  <properties>
+    <java.version>11</java.version>
+
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>1.7</maven.compiler.source>
+    <maven.compiler.target>1.7</maven.compiler.target>
+    <powsybl-core.version>5.0.0</powsybl-core.version>
+
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.11</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.powsybl</groupId>
+      <artifactId>powsybl-core</artifactId>
+      <version>${powsybl-core.version}</version>
+      <type>pom</type>
+      <scope>import</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.powsybl</groupId>
+      <artifactId>powsybl-iidm-api</artifactId>
+      <version>${powsybl-core.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.powsybl</groupId>
+      <artifactId>powsybl-iidm-extensions</artifactId>
+      <version>${powsybl-core.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.powsybl</groupId>
+      <artifactId>powsybl-loadflow-api</artifactId>
+      <version>${powsybl-core.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.powsybl</groupId>
+      <artifactId>powsybl-loadflow-results-completion</artifactId>
+      <version>${powsybl-core.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.powsybl</groupId>
+      <artifactId>powsybl-commons</artifactId>
+      <version>${powsybl-core.version}</version>
+    </dependency>
+
+
+    <dependency>
+      <groupId>com.powsybl</groupId>
+      <artifactId>powsybl-iidm-impl</artifactId>
+      <version>${powsybl-core.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.powsybl</groupId>
+      <artifactId>powsybl-ieee-cdf-converter</artifactId>
+      <version>${powsybl-core.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <version>1.7.22</version>
+    </dependency>
+    <dependency>
+      <groupId>org.scijava</groupId>
+      <artifactId>native-lib-loader</artifactId>
+      <version>2.4.0</version>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <pluginManagement>
+      <!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
+      <plugins>
+
+      </plugins>
+    </pluginManagement>
+  </build>
+</project>

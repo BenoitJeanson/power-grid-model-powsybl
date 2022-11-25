@@ -17,14 +17,6 @@ JNIEXPORT jlong JNICALL Java_com_powsybl_pgm_PgmWrapper_createCppObject
 
 /*
  * Class:     com_powsybl_pgm_PgmWrapper
- * Method:    workOnCppObject
- * Signature: (J)V
- */
-JNIEXPORT void JNICALL Java_com_powsybl_pgm_PgmWrapper_workOnCppObject
-  (JNIEnv *, jobject, jlong);
-
-/*
- * Class:     com_powsybl_pgm_PgmWrapper
  * Method:    deleteCppObject
  * Signature: (J)V
  */
@@ -52,7 +44,7 @@ JNIEXPORT void JNICALL Java_com_powsybl_pgm_PgmWrapper_addSource
  * Method:    addSymLoaGendInput
  * Signature: (JIIZIDD)V
  */
-JNIEXPORT void JNICALL Java_com_powsybl_pgm_PgmWrapper_addSymLoaGendInput
+JNIEXPORT void JNICALL Java_com_powsybl_pgm_PgmWrapper_addSymLoadGenInput
   (JNIEnv *, jobject, jlong, jint, jint, jboolean, jint, jdouble, jdouble);
 
 /*
@@ -86,6 +78,14 @@ JNIEXPORT void JNICALL Java_com_powsybl_pgm_PgmWrapper_finalizeConstruction
  */
 JNIEXPORT void JNICALL Java_com_powsybl_pgm_PgmWrapper_runPf
   (JNIEnv *, jobject, jlong);
+
+/*
+ * Class:     com_powsybl_pgm_PgmWrapper
+ * Method:    getResult
+ * Signature: (JLcom/powsybl/pgm/Result;)V
+ */
+JNIEXPORT void JNICALL Java_com_powsybl_pgm_PgmWrapper_getResult
+  (JNIEnv *, jobject, jlong, jobject);
 
 #ifdef __cplusplus
 }

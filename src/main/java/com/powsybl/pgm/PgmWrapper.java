@@ -1,43 +1,94 @@
 package com.powsybl.pgm;
 
+import java.io.IOException;
+
+import org.scijava.nativelib.NativeLoader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class PgmWrapper {
+
+    enum LoadGenType {
+        CONSTPOWER(0),
+        CONSTIMPEDANCE(1),
+        CONSTCURRENT(2);
+
+        int val;
+
+        LoadGenType(int val) {
+            this.val = val;
+        }
+
+        int val() {
+            return val;
+        }
+
+    }
 
     // Load C++ shared library
     static {
-        System.loadLibrary("pgm");
+        try {
+            NativeLoader.loadLibrary("pgm");
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(PgmWrapper.class);
     private long pgmPtr = 0;
 
     public PgmWrapper() {
         pgmPtr = createCppObject();
     }
 
-    public void workOnCppObject() {
-        workOnCppObject(pgmPtr);
-    }
-
     public void addNode(int Id, double u_rated) {
         addNode(pgmPtr, Id, u_rated);
+        LOGGER.debug("addNode\t Id: {}\tu_rated: {}", Id, u_rated);
     }
 
     public void addSource(int Id, int nodeId, boolean isConnected, double u_ref, double u_ref_angle, double sk,
             double rx_ratio, double z01_ratio) {
         addSource(pgmPtr, Id, nodeId, isConnected, u_ref, u_ref_angle, sk, rx_ratio, z01_ratio);
+        LOGGER.debug(
+                "addSource\t Id: {}\tnodeId: {}\tisConnected: {}\tu_ref: {}\tu_ref_angle: {}\tsk: {}\trx_ratio: {}\tz01_ratio: {}",
+                Id, nodeId, isConnected, u_ref, u_ref_angle, sk, rx_ratio, z01_ratio);
     }
 
     public void addSource(int Id, int nodeId, boolean isConnected, double u_ref) {
         addSource(Id, nodeId, isConnected, u_ref, 0, 1e10, 0.1, 1.0);
     }
 
-    public void addSymLoaGendInput(int Id, int nodeId, boolean isConnected, int type, double p, double q) {
-        addSymLoaGendInput(pgmPtr, Id, nodeId, isConnected, type, p, q);
+    public void addSymLoadGenInput(int Id, int nodeId, boolean isConnected, LoadGenType type, double p, double q) {
+        addSymLoadGenInput(pgmPtr, Id, nodeId, isConnected, type.val(), p, q);
+        LOGGER.debug("addSymLoaGendInput\tId: {}\tnodeId: {}\tisConnected: {}\ttype: {}\tp: {}\tq: {}",
+                Id, nodeId, isConnected, type, p, q);
     }
 
+    public void addLoad(int Id, int nodeId, boolean isConnected, LoadGenType type, double p, double q){
+        addSymLoadGenInput(Id, nodeId, isConnected, type, p, q);
+    }
+    
+    public void addLoad(int Id, int nodeId, boolean isConnected, double p, double q){
+        addSymLoadGenInput(Id, nodeId, isConnected, LoadGenType.CONSTPOWER, p, q);
+    }
+
+    public void addGen(int Id, int nodeId, boolean isConnected, LoadGenType type, double p, double q){
+        addSymLoadGenInput(Id, nodeId, isConnected, type, -p, -q);
+    }
+    
+    public void addGen(int Id, int nodeId, boolean isConnected, double p, double q){
+        addSymLoadGenInput(Id, nodeId, isConnected, LoadGenType.CONSTPOWER, -p, -q);
+    }
+    
     public void addLine(int Id, int nodeFromId, boolean isFromConnected, int nodeToId, boolean isToConnected,
             double r1, double x1, double c1, double tan1,
             double r2, double x2, double c2, double tan2, double ratedCurrent) {
         addLine(pgmPtr, Id, nodeFromId, isFromConnected, nodeToId, isToConnected, r1, x1, c1, tan1, r2, x2, c2, tan2,
+                ratedCurrent);
+        LOGGER.debug(
+                "addLine\tId: {}\tnodeFromId: {}\tisFromConnected: {}\tnodeToId: {}\tisToConnected: {}\tr1: {}\tx1: {}\tc1: {}\ttan1: {}\tr2: {}\tx2: {}\tc2: {}\ttan2: {}\tratedCurrent: {}",
+                Id, nodeFromId, isFromConnected, nodeToId, isToConnected, r1, x1, c1, tan1, r2, x2, c2, tan2,
                 ratedCurrent);
     }
 
@@ -76,10 +127,12 @@ public class PgmWrapper {
         pgmPtr = 0;
     }
 
+    public void getResult(Result result) {
+        getResult(pgmPtr, result);
+    }
+
     // Native methods
     private native long createCppObject();
-
-    private native void workOnCppObject(long cppHandler);
 
     private native void deleteCppObject(long cppHandler);
 
@@ -88,7 +141,7 @@ public class PgmWrapper {
     private native void addSource(long cppHandler, int Id, int nodeId, boolean isConnected, double u_ref,
             double u_ref_angle, double sk, double rx_ratio, double z01_ratio);
 
-    private native void addSymLoaGendInput(long cppHandler, int Id, int nodeId, boolean isConnected, int type, double p,
+    private native void addSymLoadGenInput(long cppHandler, int Id, int nodeId, boolean isConnected, int type, double p,
             double q);
 
     private native void addLine(long cppHandler, int Id,
@@ -109,4 +162,5 @@ public class PgmWrapper {
 
     private native void runPf(long cppHandler);
 
+    private native void getResult(long cppHandler, Result result);
 }

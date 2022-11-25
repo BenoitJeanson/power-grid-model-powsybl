@@ -5,7 +5,7 @@ using namespace power_grid_model;
 template <bool sym>
 Result<sym>::Result(int nb_nodes, int nb_branches, int nb_appliances)
 {
-    m_nodes= new std::vector<NodeOutput<sym>>(nb_nodes);
+    m_nodes = new std::vector<NodeOutput<sym>>(nb_nodes);
     m_branches = new std::vector<BranchOutput<sym>>(nb_branches);
     m_appliances = new std::vector<ApplianceOutput<sym>>(nb_appliances);
 }
@@ -65,7 +65,6 @@ void PgmWrapper::add_transformer(TransformerInput transformer)
     m_transformers.push_back(transformer);
 }
 
-
 void PgmWrapper::finalize_construction()
 {
     m_main_model.add_component<Node>(m_nodes.cbegin(), m_nodes.cend());
@@ -103,24 +102,46 @@ template <bool sym>
 Result<sym> PgmWrapper::retrieve_results(std::vector<MathOutput<sym>> const &math_output)
 {
     Result<sym> result(m_nodes.size(), m_lines.size(), m_sources.size() + m_sym_load_gens.size());
-    std::vector<NodeOutput<sym>> m_nodes_res(m_nodes.size());
     m_main_model.output_result<sym, Node>(math_output, result.m_nodes->begin());
     m_main_model.output_result<sym, Branch>(math_output, result.m_branches->begin());
     m_main_model.output_result<sym, Appliance>(math_output, result.m_appliances->begin());
     return result;
 }
 
+void PgmWrapper::sym_result_to_java(std::function<void(int id, double u_pu, double u, double u_angle)> eat_node,
+                                    std::function<void(int id, double p_from, double q_from,
+                                                       double i_from, double s_from, double p_to, double q_to,
+                                                       double i_to, double s_to)>
+                                        eat_branch,
+                                    std::function<void(int id, double p, double q, double i, double s, double pf)> eat_appliance)
+
+{
+    Result<true> result = retrieve_results<true>(sym_math_output);
+    for (auto n : *result.m_nodes)
+        eat_node(n.id, n.u_pu, n.u, n.u_angle);
+
+    for (auto br : *result.m_branches)
+        eat_branch(br.id, br.p_from, br.q_from, br.i_from, br.s_from, br.p_to, br.q_to, br.i_to, br.s_to);
+
+    for (auto ap : *result.m_appliances)
+        eat_appliance(ap.id, ap.p, ap.q, ap.i, ap.s, ap.pf);
+}
+
 template <bool sym>
 void PgmWrapper::run_pf(CalculationMethod calculation_method, CalculationInfo &info)
 {
-    auto math_output = m_main_model.calculate_power_flow<sym>(1e-8, 20, calculation_method);
+    if (m_is_sym)
+        sym_math_output = m_main_model.calculate_power_flow<true>(1e-8, 20, calculation_method);
+    else
+        asym_math_output = m_main_model.calculate_power_flow<false>(1e-8, 20, calculation_method);
 
     CalculationInfo info_extra = m_main_model.calculation_info();
     info.merge(info_extra);
-    auto result = retrieve_results<sym>(math_output);
+    auto result = retrieve_results<sym>(sym_math_output);
     result.print();
 
-    print_math_output(math_output);
+    if (m_is_sym)
+        print_math_output(sym_math_output);
 
     print(info);
 }

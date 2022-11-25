@@ -1,16 +1,12 @@
 #include "com_powsybl_pgm_PgmWrapper.h"
 #include "PgmWrapper.h"
+#include <iostream>
 
 using namespace power_grid_model;
 
-JNIEXPORT jlong JNICALL Java_com_powsybl_pgm_PgmWrapper_createCppObject(JNIEnv *, jobject)
+JNIEXPORT jlong JNICALL Java_com_powsybl_pgm_PgmWrapper_createCppObject(JNIEnv *env, jobject java_wrapper)
 {
   return (jlong) new PgmWrapper();
-}
-
-JNIEXPORT void JNICALL Java_com_powsybl_pgm_PgmWrapper_workOnCppObject(JNIEnv *, jobject, jlong handler)
-{
-  std::cout << ((PgmWrapper *)handler)->to_String();
 }
 
 JNIEXPORT void JNICALL Java_com_powsybl_pgm_PgmWrapper_deleteCppObject(JNIEnv *, jobject, jlong handler)
@@ -30,7 +26,7 @@ JNIEXPORT void JNICALL Java_com_powsybl_pgm_PgmWrapper_addSource(
   ((PgmWrapper *)handler)->add_source(SourceInput({{{id}, nodeId, (bool)isConnected}, u_ref, u_ref_angle, sk, rx_ratio, z01_ratio}));
 }
 
-JNIEXPORT void JNICALL Java_com_powsybl_pgm_PgmWrapper_addSymLoaGendInput(
+JNIEXPORT void JNICALL Java_com_powsybl_pgm_PgmWrapper_addSymLoadGenInput(
     JNIEnv *, jobject, jlong handler, jint id, jint nodeId, jboolean isConnected, jint type, jdouble p, jdouble q)
 {
   ((PgmWrapper *)handler)->add_sym_load_gen(SymLoadGenInput({{{{id}, nodeId, (bool)isConnected}, (LoadGenType)type}, p, q}));
@@ -65,4 +61,30 @@ JNIEXPORT void JNICALL Java_com_powsybl_pgm_PgmWrapper_runPf(JNIEnv *, jobject, 
 {
   auto info = CalculationInfo();
   ((PgmWrapper *)handler)->run_pf(CalculationMethod::newton_raphson, info);
+}
+
+JNIEXPORT void JNICALL Java_com_powsybl_pgm_PgmWrapper_getResult(JNIEnv *env, jobject, jlong handler, jobject jresult)
+{
+  jclass result_class = env->GetObjectClass(jresult);
+
+  jmethodID add_node_id = env->GetMethodID(result_class, "toNode", "(IDDD)V");
+
+  std::function<void(int, double, double, double)> f_add_node =
+      [env, jresult, add_node_id](int id, double u_pu, double u, double u_angle) -> void
+  { env->CallVoidMethod(jresult, add_node_id, id, u_pu, u, u_angle); };
+
+  jmethodID add_branch_id = env->GetMethodID(result_class, "toBranch", "(IDDDDDDDD)V");
+
+  std::function<void(int, double, double, double, double, double, double, double, double)> f_add_branch =
+      [env, jresult, add_branch_id](int id, double pFrom, double qFrom, double iFrom, double sFrom, double pTo, double qTo,
+                                    double iTo, double sTo) -> void
+  { env->CallVoidMethod(jresult, add_branch_id, id, pFrom, qFrom, iFrom, sFrom, pTo, qTo, iTo, sTo); };
+
+  jmethodID add_appliance_id = env->GetMethodID(result_class, "toAppliance", "(IDDDDD)V");
+
+  std::function<void(int, double, double, double, double, double)> f_add_appliance =
+      [env, jresult, add_appliance_id](int id, double p, double q, double i, double s, double pf) -> void
+  { env->CallVoidMethod(jresult, add_appliance_id, id, p, q, i, s, pf); };
+
+  ((PgmWrapper *)handler)->sym_result_to_java(f_add_node, f_add_branch, f_add_appliance);
 }
